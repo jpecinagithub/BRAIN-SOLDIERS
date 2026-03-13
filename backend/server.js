@@ -72,7 +72,8 @@ const corsOptions = {
       return
     }
 
-    callback(new Error(`CORS blocked for origin: ${origin}`))
+    // Do not hard-fail; just omit CORS headers for disallowed origins.
+    callback(null, false)
   },
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
