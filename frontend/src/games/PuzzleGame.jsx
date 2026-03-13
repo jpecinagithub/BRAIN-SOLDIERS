@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameContext } from '../contexts/GameContext.jsx'
+import { playUiSound } from '../audio/audioEngine'
+import { useAmbientAudio } from '../audio/useAmbientAudio'
 import styles from './PuzzleGame.module.css'
 
 const SIZE = 5
@@ -10,6 +12,7 @@ export default function PuzzleGame() {
   const { player } = useParams()
   const navigate = useNavigate()
   const { submitPlayerScore } = useGameContext()
+  const { startAmbient } = useAmbientAudio({ theme: 'mystic', volume: 0.02 })
 
   const [image, setImage] = useState(null)
   const [pieces, setPieces] = useState([])
@@ -86,6 +89,7 @@ export default function PuzzleGame() {
       objectUrlRef.current = nextObjectUrl
       setUploadError('')
       setImage(nextObjectUrl)
+      startAmbient()
       input.value = ''
     }
 
@@ -136,6 +140,7 @@ export default function PuzzleGame() {
     const points = Math.max(50 - currentMoves, 10)
     setScore(points)
     setGameOver(true)
+    playUiSound('success')
     await submitPlayerScore(player, points, 'puzzle')
   }
 

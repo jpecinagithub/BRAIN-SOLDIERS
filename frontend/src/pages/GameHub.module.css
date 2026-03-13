@@ -80,9 +80,18 @@
 }
 
 .gameIcon {
-  font-size: 3rem;
+  width: 72px;
+  height: 72px;
   margin-bottom: 16px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameIcon img {
+  width: 64px;
+  height: 64px;
+  display: block;
 }
 
 .gameCard h3 {

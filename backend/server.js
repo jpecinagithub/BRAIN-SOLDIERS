@@ -8,6 +8,33 @@ const fs = require("fs")
 const BASE_DIR = path.join(__dirname)
 const PUBLIC_DIR = path.join(BASE_DIR, "public")
 const AVATAR_DIR = path.join(PUBLIC_DIR, "avatars")
+const GAMES_DIR = path.join(PUBLIC_DIR, "games")
+const frontendDistEnv = process.env.FRONTEND_DIST_PATH
+const FRONTEND_DIST_DIR = frontendDistEnv
+  ? path.isAbsolute(frontendDistEnv)
+    ? frontendDistEnv
+    : path.resolve(BASE_DIR, frontendDistEnv)
+  : path.resolve(BASE_DIR, "..", "frontend", "dist")
+const FRONTEND_INDEX_PATH = path.join(FRONTEND_DIST_DIR, "index.html")
+const hasFrontendDist = fs.existsSync(FRONTEND_INDEX_PATH)
+
+const DEFAULT_DB_PATH = path.join(BASE_DIR, "database.db")
+const configuredDbPath = process.env.SQLITE_DB_PATH || DEFAULT_DB_PATH
+const RESOLVED_DB_PATH = path.isAbsolute(configuredDbPath)
+  ? configuredDbPath
+  : path.resolve(BASE_DIR, configuredDbPath)
+const dbDir = path.dirname(RESOLVED_DB_PATH)
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true })
+}
+
+if (RESOLVED_DB_PATH !== DEFAULT_DB_PATH && fs.existsSync(DEFAULT_DB_PATH) && !fs.existsSync(RESOLVED_DB_PATH)) {
+  try {
+    fs.copyFileSync(DEFAULT_DB_PATH, RESOLVED_DB_PATH)
+  } catch (err) {
+    console.error("Error copying seed database:", err.message)
+  }
+}
 
 const app = express()
 
@@ -45,9 +72,14 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.options("*", cors(corsOptions))
 app.use(express.json())
-app.use(express.static(PUBLIC_DIR))
+app.use("/avatars", express.static(AVATAR_DIR))
+app.use("/games", express.static(GAMES_DIR))
 
-const db = new sqlite3.Database("./database.db")
+if (hasFrontendDist) {
+  app.use(express.static(FRONTEND_DIST_DIR))
+}
+
+const db = new sqlite3.Database(RESOLVED_DB_PATH)
 
 const initialPlayers = [
   "Pedrochibus",
@@ -598,5 +630,12 @@ app.post("/score", (req, res) => {
   })
 })
 
+if (hasFrontendDist) {
+  app.get("*", (req, res) => {
+    res.sendFile(FRONTEND_INDEX_PATH)
+  })
+}
+
 const PORT = Number(process.env.PORT) || 3001
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+const HOST = process.env.HOST || "0.0.0.0"
+app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`))

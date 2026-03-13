@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7c331"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="128" cy="128" r="96" stroke="url(#ring)" stroke-width="10" fill="none" filter="url(#glow)"/>
+  <circle cx="128" cy="128" r="72" stroke="#f7c331" stroke-opacity="0.35" stroke-width="6" fill="none"/>
+  <g stroke="#f7c331" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <line x1="86" y1="158" x2="128" y2="110"/>
+    <line x1="128" y1="110" x2="170" y2="150"/>
+    <line x1="128" y1="110" x2="128" y2="72"/>
+  </g>
+  <g fill="#f7c331" fill-opacity="0.45">
+    <circle cx="86" cy="158" r="12"/>
+    <circle cx="128" cy="110" r="12"/>
+    <circle cx="170" cy="150" r="12"/>
+    <circle cx="128" cy="72" r="10"/>
+  </g>
+</svg>

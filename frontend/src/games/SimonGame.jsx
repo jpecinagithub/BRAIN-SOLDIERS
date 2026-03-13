@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { submitScore } from '../api/api'
+import { useAmbientAudio } from '../audio/useAmbientAudio'
 
 const colors = ['green', 'red', 'yellow', 'blue']
 const sounds = {
@@ -14,6 +15,7 @@ const sounds = {
 export default function SimonGame() {
   const { player } = useParams()
   const navigate = useNavigate()
+  const { startAmbient } = useAmbientAudio({ theme: 'energy', volume: 0.02 })
   const [sequence, setSequence] = useState([])
   const [playing, setPlaying] = useState(false)
   const [userTurn, setUserTurn] = useState(false)
@@ -57,6 +59,7 @@ export default function SimonGame() {
   }
 
   async function startGame() {
+    startAmbient()
     setSequence([])
     setScore(0)
     setGameOver(false)

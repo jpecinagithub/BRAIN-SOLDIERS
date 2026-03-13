@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { submitScore } from '../api/api'
+import { playUiSound } from '../audio/audioEngine'
+import { useAmbientAudio } from '../audio/useAmbientAudio'
 
 function generateQuestion(level) {
   let a, b, operator, answer
@@ -66,6 +68,7 @@ function generateOptions(correctAnswer) {
 export default function MathGame() {
   const { player } = useParams()
   const navigate = useNavigate()
+  const { startAmbient } = useAmbientAudio({ theme: 'focus', volume: 0.02 })
   const [question, setQuestion] = useState(null)
   const [userAnswer, setUserAnswer] = useState(null)
   const [score, setScore] = useState(0)
@@ -86,6 +89,7 @@ export default function MathGame() {
   }, [timeLeft, gameStarted, gameOver])
 
   function startGame() {
+    startAmbient()
     setScore(0)
     setLevel(1)
     setTimeLeft(60)
@@ -114,9 +118,11 @@ export default function MathGame() {
     if (isCorrect) {
       setScore(prev => prev + 2)
       setFeedback({ type: 'correct', message: '¡Correcto! +2 puntos' })
+      playUiSound('success')
     } else {
       setTimeLeft(prev => Math.max(0, prev - 3))
       setFeedback({ type: 'incorrect', message: `¡Incorrecto! La respuesta era ${question.answer}. -3 seg` })
+      playUiSound('fail')
     }
     
     await new Promise(resolve => setTimeout(resolve, 800))

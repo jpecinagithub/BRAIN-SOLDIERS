@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameContext } from '../contexts/GameContext.jsx'
 import { getAvatarUrl, generateAvatar, API_URL } from '../api/api'
+import { useAmbientAudio } from '../audio/useAmbientAudio'
 import styles from './MemoryGame.module.css'
 
 const CHARACTERS = [
@@ -31,6 +32,7 @@ export default function MemoryGame() {
   const { player } = useParams()
   const navigate = useNavigate()
   const { submitPlayerScore } = useGameContext()
+  const { startAmbient } = useAmbientAudio({ theme: 'pulse', volume: 0.02 })
 
   const [cards, setCards] = useState([])
   const [flipped, setFlipped] = useState([])
@@ -130,6 +132,7 @@ export default function MemoryGame() {
   async function handleCardClick(index) {
     if (isChecking || flipped.includes(index) || matched.includes(index) || gameOver) return
 
+    startAmbient()
     playSound('flip')
     const newFlipped = [...flipped, index]
     setFlipped(newFlipped)

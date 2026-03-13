@@ -1,6 +1,13 @@
 const runtimeDefaultApiUrl =
   typeof window !== 'undefined'
-    ? `${window.location.protocol}//${window.location.hostname}:3001`
+    ? (() => {
+        const { protocol, hostname, port, origin } = window.location
+        const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
+        if (isLocalhost && (port === '5173' || port === '4173')) {
+          return `${protocol}//${hostname}:3001`
+        }
+        return origin
+      })()
     : 'http://localhost:3001'
 
 export const API_URL = import.meta.env.VITE_API_URL || runtimeDefaultApiUrl
