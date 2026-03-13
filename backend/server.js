@@ -10,11 +10,20 @@ const PUBLIC_DIR = path.join(BASE_DIR, "public")
 const AVATAR_DIR = path.join(PUBLIC_DIR, "avatars")
 const GAMES_DIR = path.join(PUBLIC_DIR, "games")
 const frontendDistEnv = process.env.FRONTEND_DIST_PATH
-const FRONTEND_DIST_DIR = frontendDistEnv
+const defaultDistCandidates = [
+  path.join(PUBLIC_DIR, "app"),
+  path.resolve(BASE_DIR, "..", "frontend", "dist")
+]
+const resolvedDistFromEnv = frontendDistEnv
   ? path.isAbsolute(frontendDistEnv)
     ? frontendDistEnv
     : path.resolve(BASE_DIR, frontendDistEnv)
-  : path.resolve(BASE_DIR, "..", "frontend", "dist")
+  : null
+const detectedDist =
+  resolvedDistFromEnv ||
+  defaultDistCandidates.find((dir) => fs.existsSync(path.join(dir, "index.html"))) ||
+  defaultDistCandidates[0]
+const FRONTEND_DIST_DIR = detectedDist
 const FRONTEND_INDEX_PATH = path.join(FRONTEND_DIST_DIR, "index.html")
 const hasFrontendDist = fs.existsSync(FRONTEND_INDEX_PATH)
 
