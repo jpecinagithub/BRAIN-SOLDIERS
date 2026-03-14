@@ -76,6 +76,7 @@
 }
 
 .puzzleLayout {
+    --puzzle-size: 300px;
     display: flex;
     justify-content: center;
     gap: 40px;
@@ -94,8 +95,8 @@
 }
 
 .puzzlePreview {
-    width: 300px;
-    height: 300px;
+    width: var(--puzzle-size);
+    height: var(--puzzle-size);
     border: 2px solid var(--accent-glow);
     background-size: cover;
     background-position: center;
@@ -105,8 +106,8 @@
 .puzzleBoard {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    width: 300px; /* 5 * 60px */
-    height: 300px; /* 5 * 60px */
+    width: var(--puzzle-size);
+    height: var(--puzzle-size);
     gap: 1px; /* Small gap for visual separation */
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
     border-radius: 5px;
@@ -127,4 +128,31 @@
     grid-column: 1 / span 5;
     align-self: center;
     color: #aaa;
+}
+
+@media (max-width: 700px) {
+    .puzzleLayout {
+        --puzzle-size: min(82vw, 280px);
+        gap: 24px;
+    }
+
+    .uploadSection {
+        margin: 24px auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .puzzleLayout {
+        --puzzle-size: min(90vw, 240px);
+        gap: 18px;
+    }
+
+    .uploadSection {
+        max-width: 92vw;
+        padding: 14px;
+    }
+
+    .fileInput {
+        font-size: 0.85rem;
+    }
 }

@@ -54,6 +54,10 @@ body::before {
   margin: 0 auto;
 }
 
+.home-container {
+  width: 100%;
+}
+
 .header {
   text-align: center;
   padding: 60px 0;
@@ -1818,4 +1822,339 @@ body::before {
 .number-key:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 20px 12px;
+  }
+
+  .header {
+    padding: 28px 0;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    letter-spacing: 0.04em;
+  }
+
+  .players-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 10px;
+  }
+
+  .character-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .avatar-wrapper {
+    margin-bottom: 18px;
+  }
+
+  .avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .character-name {
+    font-size: 1.4rem;
+  }
+
+  .score-badge {
+    padding: 8px 18px;
+  }
+
+  .score-badge .value {
+    font-size: 1.2rem;
+  }
+
+  .play-btn-premium {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    padding: 16px;
+  }
+
+  .ranking-section {
+    margin: 40px auto;
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .ranking-section h2 {
+    font-size: 2.1rem;
+    margin-bottom: 30px;
+  }
+
+  .ranking-header {
+    margin-bottom: 26px;
+  }
+
+  .ranking-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px;
+  }
+
+  .player-score {
+    font-size: 1.25rem;
+  }
+
+  .game-hub {
+    padding: 20px 0;
+  }
+
+  .game-hub h1 {
+    margin-bottom: 30px;
+  }
+
+  .games-grid {
+    gap: 18px;
+  }
+
+  .game-card {
+    padding: 28px 20px;
+    border-radius: 26px;
+  }
+
+  .game-icon {
+    font-size: 3.2rem;
+  }
+
+  .game-card h3 {
+    font-size: 1.5rem;
+  }
+
+  .game-card p {
+    font-size: 1rem;
+  }
+
+  .simon-header-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .simon-score-panel {
+    align-items: center;
+  }
+
+  .simon-score-panel .value {
+    font-size: 1.6rem;
+  }
+
+  .simon-center-core {
+    border-width: 6px;
+  }
+
+  .countdown-num {
+    font-size: 2.4rem;
+  }
+
+  .back-btn {
+    font-size: 0.75rem;
+    padding: 10px 16px;
+    margin-bottom: 18px;
+  }
+
+  .math-game,
+  .puzzle-game,
+  .memory-game {
+    padding: 10px;
+  }
+
+  .math-question {
+    font-size: 2.2rem;
+    margin: 24px 0;
+  }
+
+  .math-input {
+    width: min(82vw, 240px);
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+
+  .options-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-width: min(92vw, 360px);
+  }
+
+  .option-btn {
+    font-size: 1.4rem;
+    padding: 18px;
+  }
+
+  .stroop-options {
+    grid-template-columns: 1fr;
+  }
+
+  .path-grid {
+    grid-template-columns: repeat(4, minmax(52px, 1fr));
+    gap: 8px;
+  }
+
+  .path-cell {
+    width: 52px;
+    height: 52px;
+  }
+
+  .grid-board {
+    grid-template-columns: repeat(5, minmax(48px, 1fr));
+    gap: 8px;
+  }
+
+  .grid-cell {
+    width: 52px;
+    height: 52px;
+    font-size: 1.2rem;
+  }
+
+  .rotation-options,
+  .rule-options {
+    gap: 12px;
+  }
+
+  .compare-display {
+    flex-direction: column;
+    gap: 10px;
+    font-size: 2rem;
+  }
+
+  .compare-options {
+    flex-wrap: wrap;
+  }
+
+  .number-display {
+    font-size: 2rem;
+  }
+
+  .number-pad {
+    grid-template-columns: repeat(3, minmax(64px, 1fr));
+    gap: 10px;
+  }
+
+  .number-key {
+    font-size: 1rem;
+    padding: 12px 0;
+  }
+
+  .game-over-modal,
+  .game-over-content {
+    padding: 30px;
+    border-radius: 24px;
+  }
+
+  .game-over-header {
+    font-size: 1.9rem;
+  }
+
+  .final-score .number {
+    font-size: 2.8rem;
+  }
+
+  .game-over-content h2 {
+    font-size: 2.2rem;
+  }
+
+  .game-over-content p {
+    font-size: 1.2rem;
+  }
+
+  .game-over-content button {
+    padding: 14px 28px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .admin-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form .math-btn {
+    width: 100%;
+  }
+
+  .admin-players-head,
+  .admin-player-row {
+    grid-template-columns: 0.3fr 1fr 0.6fr 0.8fr auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .app {
+    padding: 16px 10px;
+  }
+
+  .header h1 {
+    font-size: clamp(2.2rem, 12vw, 3rem);
+  }
+
+  .character-card {
+    padding: 18px;
+  }
+
+  .avatar-container {
+    width: 104px;
+    height: 104px;
+  }
+
+  .ranking-section {
+    padding: 20px;
+  }
+
+  .ranking-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .game-card {
+    padding: 22px 16px;
+  }
+
+  .game-icon {
+    font-size: 2.8rem;
+  }
+
+  .math-question {
+    font-size: 1.9rem;
+  }
+
+  .option-btn {
+    font-size: 1.2rem;
+    padding: 16px;
+  }
+
+  .path-grid {
+    grid-template-columns: repeat(4, minmax(46px, 1fr));
+  }
+
+  .path-cell {
+    width: 46px;
+    height: 46px;
+  }
+
+  .grid-board {
+    grid-template-columns: repeat(5, minmax(42px, 1fr));
+  }
+
+  .grid-cell {
+    width: 46px;
+    height: 46px;
+    font-size: 1.1rem;
+  }
+
+  .number-pad {
+    grid-template-columns: repeat(3, minmax(56px, 1fr));
+  }
+
+  .game-over-content h2 {
+    font-size: 2rem;
+  }
+
+  .game-over-content p {
+    font-size: 1.1rem;
+  }
 }

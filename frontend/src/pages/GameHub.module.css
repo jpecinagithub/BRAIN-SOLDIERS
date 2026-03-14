@@ -144,3 +144,31 @@
     padding: 20px 16px;
   }
 }
+
+@media (max-width: 420px) {
+  .title {
+    font-size: clamp(1.7rem, 8vw, 2.6rem);
+  }
+
+  .hubSubtitle {
+    font-size: 0.95rem;
+  }
+
+  .gameIcon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .gameIcon img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .gameCard h3 {
+    font-size: 1.05rem;
+  }
+
+  .gameCard p {
+    font-size: 0.9rem;
+  }
+}
