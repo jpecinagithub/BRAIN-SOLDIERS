@@ -10,6 +10,7 @@ import {
   getGameMode,
   getPlayers,
   getTeams,
+  resetScores,
   setGameMode
 } from '../api/api'
 
@@ -151,6 +152,24 @@ export default function AdminPage() {
     }
   }
 
+  async function handleResetScores() {
+    const ok = window.confirm('¿Reiniciar todas las puntuaciones a 0?')
+    if (!ok) return
+
+    setLoading(true)
+    setError('')
+    setMessage('')
+    try {
+      await resetScores()
+      setMessage('Puntuaciones reiniciadas a 0.')
+      await loadData()
+    } catch (err) {
+      setError(err.message || 'No se pudieron reiniciar las puntuaciones.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="math-game admin-page">
       <div className="admin-topbar">
@@ -194,6 +213,20 @@ export default function AdminPage() {
               disabled={loading}
             >
               Equipos
+            </button>
+          </div>
+          <div className="admin-reset-row">
+            <div>
+              <p className="admin-reset-title">Reiniciar puntuaciones</p>
+              <p className="admin-reset-desc">Pone todas las puntuaciones en 0.</p>
+            </div>
+            <button
+              type="button"
+              className="option-btn incorrect admin-danger-btn admin-reset-btn"
+              onClick={handleResetScores}
+              disabled={loading || players.length === 0}
+            >
+              Reiniciar
             </button>
           </div>
         </section>

@@ -1230,6 +1230,34 @@ body::before {
   cursor: default;
 }
 
+.admin-reset-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-reset-title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.admin-reset-desc {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-reset-btn {
+  min-width: 110px !important;
+}
+
 .admin-form {
   display: grid;
   grid-template-columns: 1fr auto;

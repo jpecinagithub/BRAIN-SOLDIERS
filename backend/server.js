@@ -396,6 +396,26 @@ app.get("/ranking", (req, res) => {
   })
 })
 
+app.post("/scores/reset", (req, res) => {
+  let affectedPlayers = 0
+
+  db.run("UPDATE players SET score = 0", function(updateErr) {
+    if (updateErr) {
+      res.status(500).json({ error: updateErr.message })
+      return
+    }
+    affectedPlayers = this.changes
+
+    db.run("DELETE FROM scores", (deleteErr) => {
+      if (deleteErr) {
+        res.status(500).json({ error: deleteErr.message })
+        return
+      }
+      res.json({ status: "ok", affectedPlayers })
+    })
+  })
+})
+
 app.get("/players", (req, res) => {
   db.all(`
     SELECT players.id, players.name, players.score, players.avatar_file, players.team_id, teams.name AS team_name

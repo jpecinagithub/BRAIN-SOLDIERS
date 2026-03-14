@@ -150,3 +150,14 @@ export async function assignPlayerTeam(playerId, teamId) {
   }
   return res.json()
 }
+
+export async function resetScores() {
+  const res = await fetch(`${API_URL}/scores/reset`, {
+    method: 'POST'
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'No se pudieron reiniciar las puntuaciones')
+  }
+  return res.json()
+}
