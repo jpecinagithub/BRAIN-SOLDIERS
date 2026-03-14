@@ -7,12 +7,15 @@ import {
   createTeam,
   deletePlayer,
   deleteTeam,
+  getGameStatuses,
   getGameMode,
   getPlayers,
   getTeams,
   resetScores,
+  setGameStatus,
   setGameMode
 } from '../api/api'
+import { gamesCatalog } from '../data/games'
 
 export default function AdminPage() {
   const navigate = useNavigate()
@@ -22,9 +25,19 @@ export default function AdminPage() {
   const [teamName, setTeamName] = useState('')
   const [loading, setLoading] = useState(false)
   const [updatingPlayerId, setUpdatingPlayerId] = useState(null)
+  const [updatingGameId, setUpdatingGameId] = useState(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [gameMode, setGameModeState] = useState('individual')
+  const [gameStatuses, setGameStatuses] = useState({})
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: '',
+    onConfirm: null
+  })
 
   useEffect(() => {
     loadData()
@@ -32,11 +45,16 @@ export default function AdminPage() {
 
   async function loadData() {
     try {
-      const [playersData, teamsData] = await Promise.all([getPlayers(), getTeams()])
+      const [playersData, teamsData, gameStatusData, modeData] = await Promise.all([
+        getPlayers(),
+        getTeams(),
+        getGameStatuses(),
+        getGameMode()
+      ])
       setPlayers(Array.isArray(playersData) ? playersData : [])
       setTeams(Array.isArray(teamsData) ? teamsData : [])
-      const modeData = await getGameMode()
       setGameModeState(modeData?.mode === 'teams' ? 'teams' : 'individual')
+      setGameStatuses(gameStatusData?.games || {})
     } catch {
       setError('No se pudieron cargar la configuración, jugadores y equipos.')
     }
@@ -62,10 +80,7 @@ export default function AdminPage() {
     }
   }
 
-  async function handleDelete(playerId, playerName) {
-    const ok = window.confirm(`Eliminar a "${playerName}"?`)
-    if (!ok) return
-
+  async function runDeletePlayer(playerId, playerName) {
     setLoading(true)
     setError('')
     setMessage('')
@@ -78,6 +93,15 @@ export default function AdminPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleDelete(playerId, playerName) {
+    openConfirm({
+      title: 'Eliminar jugador',
+      message: `¿Eliminar a "${playerName}"?`,
+      confirmLabel: 'Eliminar',
+      onConfirm: () => runDeletePlayer(playerId, playerName)
+    })
   }
 
   async function handleCreateTeam(e) {
@@ -100,10 +124,7 @@ export default function AdminPage() {
     }
   }
 
-  async function handleDeleteTeam(teamId, teamLabel) {
-    const ok = window.confirm(`Eliminar el equipo "${teamLabel}"? Los jugadores quedarán sin equipo.`)
-    if (!ok) return
-
+  async function runDeleteTeam(teamId, teamLabel) {
     setLoading(true)
     setError('')
     setMessage('')
@@ -116,6 +137,15 @@ export default function AdminPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleDeleteTeam(teamId, teamLabel) {
+    openConfirm({
+      title: 'Eliminar equipo',
+      message: `¿Eliminar el equipo "${teamLabel}"? Los jugadores quedarán sin equipo.`,
+      confirmLabel: 'Eliminar',
+      onConfirm: () => runDeleteTeam(teamId, teamLabel)
+    })
   }
 
   async function handleAssignTeam(playerId, teamIdValue) {
@@ -152,10 +182,45 @@ export default function AdminPage() {
     }
   }
 
-  async function handleResetScores() {
-    const ok = window.confirm('¿Reiniciar todas las puntuaciones a 0?')
-    if (!ok) return
+  function openConfirm({ title, message, confirmLabel, onConfirm }) {
+    setConfirmState({
+      open: true,
+      title,
+      message,
+      confirmLabel: confirmLabel || 'Confirmar',
+      onConfirm
+    })
+  }
 
+  function closeConfirm() {
+    setConfirmState({
+      open: false,
+      title: '',
+      message: '',
+      confirmLabel: '',
+      onConfirm: null
+    })
+  }
+
+  async function handleConfirmAction() {
+    const action = confirmState.onConfirm
+    if (!action) {
+      closeConfirm()
+      return
+    }
+
+    try {
+      await action()
+    } finally {
+      closeConfirm()
+    }
+  }
+
+  function handleResetScores() {
+    setShowResetConfirm(true)
+  }
+
+  async function handleConfirmResetScores() {
     setLoading(true)
     setError('')
     setMessage('')
@@ -167,6 +232,25 @@ export default function AdminPage() {
       setError(err.message || 'No se pudieron reiniciar las puntuaciones.')
     } finally {
       setLoading(false)
+      setShowResetConfirm(false)
+    }
+  }
+
+  async function handleGameStatusChange(gameId, nextActive, gameLabel) {
+    setUpdatingGameId(gameId)
+    setError('')
+    setMessage('')
+    try {
+      const response = await setGameStatus(gameId, nextActive)
+      setGameStatuses((prev) => ({
+        ...prev,
+        [gameId]: response.active
+      }))
+      setMessage(`Juego ${gameLabel} actualizado a ${response.active ? 'activo' : 'no activo'}.`)
+    } catch (err) {
+      setError(err.message || 'No se pudo actualizar el estado del juego.')
+    } finally {
+      setUpdatingGameId(null)
     }
   }
 
@@ -233,6 +317,37 @@ export default function AdminPage() {
 
         {message && <div className="message success admin-msg">{message}</div>}
         {error && <div className="message error admin-msg">{error}</div>}
+
+        <section className="admin-card admin-games">
+          <div className="admin-panel-header">
+            <h3>Estado de juegos</h3>
+            <span>{gamesCatalog.length}</span>
+          </div>
+          <div className="admin-games-list">
+            {gamesCatalog.map((game) => {
+              const isActive = gameStatuses[game.id] !== false
+              return (
+                <div key={game.id} className="admin-row admin-game-row" style={{ '--game-color': game.color }}>
+                  <div className="admin-game-name">
+                    <span className="admin-game-dot" />
+                    <div>
+                      <strong>{game.name}</strong>
+                      <small>{game.description}</small>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className={`admin-toggle ${isActive ? 'active' : 'inactive'}`}
+                    onClick={() => handleGameStatusChange(game.id, !isActive, game.name)}
+                    disabled={loading || updatingGameId === game.id}
+                  >
+                    {isActive ? 'Activo' : 'No activo'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </section>
 
         <div className="admin-columns">
           <div className="admin-column">
@@ -338,6 +453,60 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {showResetConfirm && (
+        <div className="game-over" role="dialog" aria-modal="true" aria-label="Confirmar reinicio">
+          <div className="game-over-content">
+            <h2>Reiniciar puntuaciones</h2>
+            <p>¿Seguro que quieres poner todas las puntuaciones en 0?</p>
+            <div className="modal-actions">
+              <button
+                className="btn-primary"
+                onClick={handleConfirmResetScores}
+                disabled={loading}
+                type="button"
+              >
+                Sí, reiniciar
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => setShowResetConfirm(false)}
+                disabled={loading}
+                type="button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmState.open && (
+        <div className="game-over" role="dialog" aria-modal="true" aria-label={confirmState.title}>
+          <div className="game-over-content">
+            <h2>{confirmState.title}</h2>
+            <p>{confirmState.message}</p>
+            <div className="modal-actions">
+              <button
+                className="btn-primary"
+                onClick={handleConfirmAction}
+                disabled={loading}
+                type="button"
+              >
+                {confirmState.confirmLabel}
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={closeConfirm}
+                disabled={loading}
+                type="button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

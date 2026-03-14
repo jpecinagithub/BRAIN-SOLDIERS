@@ -64,6 +64,28 @@ export async function setGameMode(mode) {
   return res.json()
 }
 
+export async function getGameStatuses() {
+  const res = await fetch(`${API_URL}/settings/games`)
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'No se pudo obtener el estado de los juegos')
+  }
+  return res.json()
+}
+
+export async function setGameStatus(gameId, active) {
+  const res = await fetch(`${API_URL}/settings/games/${gameId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ active })
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'No se pudo actualizar el estado del juego')
+  }
+  return res.json()
+}
+
 export async function getPlayers() {
   const res = await fetch(`${API_URL}/players`)
   return res.json()

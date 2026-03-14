@@ -1,29 +1,40 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useGameContext } from '../contexts/GameContext.jsx'
-import { API_URL } from '../api/api'
+import { getGameStatuses } from '../api/api'
+import { gamesCatalog } from '../data/games'
 import styles from './GameHub.module.css'
-
-const games = [
-  { id: 'simon', name: 'Misión Simon', icon: `${API_URL}/games/simon.svg`, description: 'Reconocimiento de Patrones', color: '#ff6b35' },
-  { id: 'puzzle', name: 'Misión Puzzle', icon: `${API_URL}/games/puzzle.svg`, description: 'Reconstrucción de Imagen', color: '#bc13fe' },
-  { id: 'memory', name: 'Misión Memoria', icon: `${API_URL}/games/memory.svg`, description: 'Fortalecimiento Neural', color: '#00ff88' },
-  { id: 'math', name: 'Misión Cálculo', icon: `${API_URL}/games/math.svg`, description: 'Velocidad Computacional', color: '#ff4757' },
-  { id: 'stroop', name: 'Stroop Express', icon: `${API_URL}/games/stroop.svg`, description: 'Control Inhibitorio', color: '#00d4ff' },
-  { id: 'sequence', name: 'Secuencia Lógica', icon: `${API_URL}/games/sequence.svg`, description: 'Patrones y series', color: '#f7c331' },
-  { id: 'path', name: 'Camino Fantasma', icon: `${API_URL}/games/path.svg`, description: 'Memoria visuoespacial', color: '#6c5ce7' },
-  { id: 'search', name: 'Búsqueda Visual', icon: `${API_URL}/games/search.svg`, description: 'Agilidad visual', color: '#ff9f43' },
-  { id: 'rotation', name: 'Rotación Rápida', icon: `${API_URL}/games/rotation.svg`, description: 'Rotación mental', color: '#1dd1a1' },
-  { id: 'compare', name: 'Comparación Relámpago', icon: `${API_URL}/games/compare.svg`, description: 'Decisión rápida', color: '#ff6b81' },
-  { id: 'rule', name: 'Parejas con Regla', icon: `${API_URL}/games/rule.svg`, description: 'Atención y criterio', color: '#48dbfb' },
-  { id: 'echo', name: 'Eco Numérico', icon: `${API_URL}/games/echo.svg`, description: 'Memoria de trabajo', color: '#54a0ff' }
-]
 
 export default function GameHub() {
   const navigate = useNavigate()
   const { player } = useParams()
   const { currentPlayer } = useGameContext()
   const activePlayer = currentPlayer || player
+  const [gameStatuses, setGameStatuses] = useState({})
+
+  useEffect(() => {
+    let isMounted = true
+    const loadStatuses = async () => {
+      try {
+        const data = await getGameStatuses()
+        if (!isMounted) return
+        setGameStatuses(data?.games || {})
+      } catch (error) {
+        console.error('Error loading game statuses:', error)
+      }
+    }
+
+    loadStatuses()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const visibleGames = useMemo(
+    () => gamesCatalog.filter((game) => gameStatuses[game.id] !== false),
+    [gameStatuses]
+  )
 
   return (
     <div className={styles.gameHub}>
@@ -57,7 +68,10 @@ export default function GameHub() {
       </motion.p>
 
       <div className={styles.gamesGrid}>
-        {games.map((game, index) => (
+        {visibleGames.length === 0 && (
+          <div className={styles.noGames}>No hay juegos activos por ahora.</div>
+        )}
+        {visibleGames.map((game, index) => (
           <motion.div
             key={game.id}
             className={styles.gameCard}
@@ -68,20 +82,20 @@ export default function GameHub() {
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate(`/game/${activePlayer}/${game.id}`)}
             style={{ '--game-color': game.color }}
-            >
-              <motion.div
-                className={styles.gameIcon}
-                animate={{
+          >
+            <motion.div
+              className={styles.gameIcon}
+              animate={{
                 filter: [
                   `drop-shadow(0 0 10px ${game.color}66)`,
                   `drop-shadow(0 0 30px ${game.color}aa)`,
                   `drop-shadow(0 0 10px ${game.color}66)`
                 ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <img src={game.icon} alt={`${game.name} icon`} />
-              </motion.div>
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <img src={game.icon} alt={`${game.name} icon`} />
+            </motion.div>
             <h3>{game.name}</h3>
             <p>{game.description}</p>
           </motion.div>

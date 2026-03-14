@@ -235,7 +235,7 @@ export default function MemoryGame() {
 
       {message && (
         <motion.div
-          className={`${styles.message} ${styles.info}`}
+          className="message info"
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -287,7 +287,7 @@ export default function MemoryGame() {
         {gameOver && (
           <div className="game-over">
             <motion.div
-              className={styles.gameOverContent}
+              className="game-over-content"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}

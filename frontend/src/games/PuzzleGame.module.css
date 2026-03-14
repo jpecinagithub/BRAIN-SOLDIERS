@@ -128,16 +128,3 @@
     align-self: center;
     color: #aaa;
 }
-
-.game-over-content {
-    background: rgba(10, 10, 20, 0.95);
-    border: 2px solid var(--primary);
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-}
-
-.game-over-content h2 {
-    color: var(--primary);
-    margin-bottom: 15px;
-}

@@ -47,6 +47,21 @@ if (RESOLVED_DB_PATH !== DEFAULT_DB_PATH && fs.existsSync(DEFAULT_DB_PATH) && !f
 
 const app = express()
 
+const DEFAULT_GAME_STATUSES = {
+  simon: true,
+  puzzle: true,
+  memory: true,
+  math: true,
+  stroop: true,
+  sequence: true,
+  path: true,
+  search: true,
+  rotation: true,
+  compare: true,
+  rule: true,
+  echo: true
+}
+
 const rawCorsOrigins = process.env.CORS_ORIGINS || ""
 const allowedOrigins = rawCorsOrigins
   .split(",")
@@ -213,11 +228,113 @@ function ensureSettingsReady(callback) {
             callback(seedErr)
             return
           }
-          callback(null)
+          db.run(
+            "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('game_statuses', ?)",
+            [JSON.stringify(DEFAULT_GAME_STATUSES)],
+            (seedGameErr) => {
+              if (seedGameErr) {
+                callback(seedGameErr)
+                return
+              }
+              callback(null)
+            }
+          )
         }
       )
     }
   )
+}
+
+function normalizeActiveValue(value) {
+  if (typeof value === "boolean") {
+    return value
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase()
+    if (normalized === "false" || normalized === "0" || normalized === "no") {
+      return false
+    }
+    if (normalized === "true" || normalized === "1" || normalized === "yes") {
+      return true
+    }
+  }
+
+  if (typeof value === "number") {
+    return value !== 0
+  }
+
+  return Boolean(value)
+}
+
+function getGameStatuses(callback) {
+  ensureSettingsReady((settingsErr) => {
+    if (settingsErr) {
+      callback(settingsErr)
+      return
+    }
+
+    db.get(
+      "SELECT value FROM app_settings WHERE key = 'game_statuses'",
+      (err, row) => {
+        if (err) {
+          callback(err)
+          return
+        }
+
+        let rawStatuses = {}
+        let shouldPersist = !row
+        if (row?.value) {
+          try {
+            const parsed = JSON.parse(row.value)
+            if (parsed && typeof parsed === "object") {
+              rawStatuses = parsed
+            } else {
+              shouldPersist = true
+            }
+          } catch {
+            shouldPersist = true
+          }
+        } else {
+          shouldPersist = true
+        }
+
+        const normalizedStatuses = { ...rawStatuses }
+
+        Object.keys(normalizedStatuses).forEach((key) => {
+          const normalizedValue = normalizeActiveValue(normalizedStatuses[key])
+          if (normalizedValue !== normalizedStatuses[key]) {
+            normalizedStatuses[key] = normalizedValue
+            shouldPersist = true
+          }
+        })
+
+        Object.entries(DEFAULT_GAME_STATUSES).forEach(([key, value]) => {
+          if (typeof normalizedStatuses[key] !== "boolean") {
+            normalizedStatuses[key] = value
+            shouldPersist = true
+          }
+        })
+
+        if (!shouldPersist) {
+          callback(null, normalizedStatuses)
+          return
+        }
+
+        db.run(
+          "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('game_statuses', ?)",
+          [JSON.stringify(normalizedStatuses)],
+          (writeErr) => {
+            if (writeErr) {
+              callback(writeErr)
+              return
+            }
+            callback(null, normalizedStatuses)
+          }
+        )
+      }
+    )
+  })
 }
 
 db.serialize(() => {
@@ -355,6 +472,53 @@ app.patch("/settings/game-mode", (req, res) => {
           return
         }
         res.json({ status: "ok", mode })
+      }
+    )
+  })
+})
+
+app.get("/settings/games", (req, res) => {
+  getGameStatuses((err, games) => {
+    if (err) {
+      res.status(500).json({ error: err.message })
+      return
+    }
+    res.json({ games })
+  })
+})
+
+app.patch("/settings/games/:id", (req, res) => {
+  const gameId = String(req.params.id || "").trim().toLowerCase()
+  if (!gameId) {
+    res.status(400).json({ error: "Game id is required" })
+    return
+  }
+
+  const hasActive = Object.prototype.hasOwnProperty.call(req.body || {}, "active")
+  if (!hasActive) {
+    res.status(400).json({ error: "Active flag is required" })
+    return
+  }
+
+  const active = normalizeActiveValue(req.body.active)
+
+  getGameStatuses((err, games) => {
+    if (err) {
+      res.status(500).json({ error: err.message })
+      return
+    }
+
+    const updatedGames = { ...games, [gameId]: active }
+
+    db.run(
+      "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('game_statuses', ?)",
+      [JSON.stringify(updatedGames)],
+      (writeErr) => {
+        if (writeErr) {
+          res.status(500).json({ error: writeErr.message })
+          return
+        }
+        res.json({ status: "ok", id: gameId, active })
       }
     )
   })

@@ -45,6 +45,17 @@
   padding: 8px;
 }
 
+.noGames {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  background: rgba(8, 12, 18, 0.35);
+}
+
 .gameCard {
   --card-glow: color-mix(in srgb, var(--game-color) 55%, #ffffff 0%);
   background: linear-gradient(145deg, rgba(26, 26, 46, 0.72), rgba(10, 10, 15, 0.85));

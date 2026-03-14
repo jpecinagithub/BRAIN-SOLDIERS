@@ -234,7 +234,7 @@ export default function PuzzleGame() {
         {gameOver && (
           <motion.div className="game-over" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div
-              className={styles.gameOverContent}
+              className="game-over-content"
               initial={{ scale: 0.5, y: 50 }}
               animate={{ scale: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 300 }}

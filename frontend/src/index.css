@@ -916,6 +916,44 @@ body::before {
   text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
 }
 
+.message {
+  margin: 14px auto;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(8, 12, 18, 0.7);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-align: center;
+  max-width: 520px;
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.12);
+}
+
+.message.info {
+  border-color: rgba(0, 212, 255, 0.6);
+  color: #c9f7ff;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(8, 12, 18, 0.75));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.message.success,
+.message.correct {
+  border-color: rgba(0, 255, 136, 0.7);
+  color: #d9ffe9;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.12), rgba(8, 12, 18, 0.75));
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.message.error,
+.message.incorrect {
+  border-color: rgba(255, 71, 87, 0.75);
+  color: #ffd6da;
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.16), rgba(8, 12, 18, 0.78));
+  box-shadow: 0 0 22px rgba(255, 71, 87, 0.2);
+}
+
 .level-display {
   font-size: 1.4rem;
   color: #888;
@@ -1353,6 +1391,69 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-games-list {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-game-row {
+  gap: 12px;
+}
+
+.admin-game-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-game-name small {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+.admin-game-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--game-color, var(--accent));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--game-color, var(--accent)) 70%, transparent);
+  flex: 0 0 10px;
+}
+
+.admin-toggle {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  min-width: 92px;
+}
+
+.admin-toggle.active {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.35), rgba(0, 255, 136, 0.12));
+  color: #d9ffe9;
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.2);
+}
+
+.admin-toggle.inactive {
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.35), rgba(255, 71, 87, 0.12));
+  color: #ffd6da;
+  box-shadow: 0 0 18px rgba(255, 71, 87, 0.2);
+}
+
+.admin-toggle:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .admin-row strong {
